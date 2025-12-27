@@ -1348,26 +1348,28 @@
         
         // 印刷機能
         function printResult() {
-            console.log('印刷機能が呼び出されました');
-            
+            console.log('🖨️ 印刷機能が呼び出されました');
+
             // 解答詳細を表示（まだ表示されていない場合）
             const answerReview = document.getElementById('answerReview');
             if (answerReview && answerReview.classList.contains('hidden')) {
                 console.log('解答詳細を表示します');
                 showAnswerReview();
             }
-            
-            // 印刷ダイアログを表示
-            setTimeout(() => {
+
+            // ✅ 重要：window.print() はユーザー操作に直結した同期処理で呼ぶ必要があるため、
+            // setTimeout は避け、DOM反映用に requestAnimationFrame を1フレームだけ挟む
+            requestAnimationFrame(() => {
                 try {
                     window.print();
-                    console.log('印刷ダイアログが呼び出されました');
+                    console.log('✅ 印刷ダイアログが呼び出されました');
                 } catch (error) {
-                    console.error('印刷エラー:', error);
-                    alert('印刷機能でエラーが発生しました。ブラウザの印刷機能（Ctrl+P）をお試しください。');
+                    console.error('❌ 印刷エラー:', error);
+                    alert('印刷機能でエラーが発生しました。ブラウザの印刷機能（Ctrl+P / ⌘+P）をお試しください。');
                 }
-            }, 500);
+            });
         }
+
         
         // ブラウザの印刷ショートカットキー（Ctrl+P）も有効にする
         document.addEventListener('keydown', function(event) {
