@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>土壌医検定模擬試験システム_3級 </title>
+    <title>土壌医検定模擬試験システム - 50問60分</title>
     <style>
         * {
             margin: 0;
@@ -575,7 +575,6 @@
     
 .inTest #chapterBreakdown{display:none !important;}
 
-
 .inTest #chapterInfoSection{display:none !important; height:0 !important; margin:0 !important; padding:0 !important;}
 
         /* ✅ テスト画面下部：最初からテストを行うボタン */
@@ -590,61 +589,10 @@
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-window.addEventListener('error',(e)=>{const d=document.getElementById('diag'); if(d){d.innerHTML += `❌ JSエラー: ${e.message}<br>`;}});
 
-        function updateStartButtonState() {
-            try {
-            const startBtn = document.getElementById('startBtn');
-            const name = (document.getElementById('userName')?.value || '').trim();
-            const fileLoaded = (typeof allQuestions !== 'undefined' && allQuestions && allQuestions.length > 0);
-
-            let total = null;
-            try { total = calcDistributionTotalFromInputs(); } catch (e) { total = null; }
-            const totalOk = (total === 50);
-
-            if (startBtn) startBtn.disabled = !(name && fileLoaded && totalOk);
-
-            const diag = document.getElementById('diag');
-            const mk = (ok)=> ok?'✅':'❌';
-            if (diag) {
-                diag.innerHTML += '⏱ updateStartButtonState 実行<br>';
-                diag.innerHTML += '診断:<br>' +
-                  `${mk(!!name)} 名前入力<br>` +
-                  `${mk(fileLoaded)} Excel読込<br>` +
-                  `${mk(totalOk)} 合計50（現在: ${total===null?'未計算':total}）<br>` +
-                  `XLSX: ${typeof XLSX !== 'undefined' ? 'OK' : 'NG'}<br>`;
-            }
-            } catch(e) {
-                const d=document.getElementById('diag');
-                if(d) d.innerHTML += '❌ updateStartButtonStateエラー: '+e.message+'<br>';
-            }
-        }
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const d=document.getElementById('diag'); if(d) d.innerHTML += '✅ DOMContentLoaded 発火<br>';
-
-    if (typeof updateStartButtonState === 'function') {
-        updateStartButtonState();
-        const d=document.getElementById('diag'); if(d) d.innerHTML += '✅ updateStartButtonState 呼出<br>';
-    } else {
-        const d=document.getElementById('diag'); if(d) d.innerHTML += '❌ updateStartButtonState が未定義<br>';
-    }
-
-    updateStartButtonState();
-    const nameEl = document.getElementById('userName');
-    if (nameEl) nameEl.addEventListener('input', updateStartButtonState);
-
-    // 章配分入力欄の変更でも更新
-    const dist = document.getElementById('distributionInputs');
-    if (dist) dist.addEventListener('input', updateStartButtonState);
-});
-</script>
     
     <div class="container">
-<div id="diag" style="margin:12px auto; max-width:800px; padding:10px 12px; border:1px solid #d8eaff; background:#f5fbff; border-radius:10px; font-size:14px; line-height:1.4; display:none;; min-height:120px; overflow:auto;">診断:<br></div>
+
 <div class="header">
             <h2>土壌医検定模擬試験システム</h2>
         </div>
@@ -848,22 +796,23 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     
     <script>
+
+
         // 章ごとの出題割合設定
         const CHAPTER_DISTRIBUTION = {
             '1章': { percentage: 2, count: 1 },
             '2章': { percentage: 11, count: 6 },
-            '3章': { percentage: 31, count: 16 },
+            '3章': { percentage: 31, count: 15 },
             '4章': { percentage: 10, count: 5 },
-            '5章': { percentage: 15, count: 8 },
+            '5章': { percentage: 15, count: 7 },
             '6章': { percentage: 11, count: 6 },
             '7章': { percentage: 5, count: 3 },
             '8章': { percentage: 10, count: 5 },
-            '9章': { percentage: 5, count: 3 }
+            '9章': { percentage: 5, count: 2 }
         };
-        // ✅ 章配分のユーザー設定（localStorageに保存）
+
         const DEFAULT_CHAPTER_DISTRIBUTION = JSON.parse(JSON.stringify(CHAPTER_DISTRIBUTION));
 
-        // ✅ percentage（割合）から合計が必ず指定数になるように count（必要数）を再計算する
         // 最大剰余法（Largest Remainder Method）で丸め誤差を吸収し、合計をぴったり揃える
         function normalizeDistributionToTotal(dist, totalQuestions = 50) {
             const chapters = Object.keys(dist);
@@ -1048,18 +997,17 @@ function updateDistributionStatus() {
             displayChapterInfo();
             updateStartButtonState(); // 表示更新
             updateStartButtonState();
-            
-            // ✅ 設定パネルを確実に閉じる（v39）
+
             (function(){
                 const p=document.getElementById('settingsPanel');
                 if(p){ p.hidden = true; p.classList.add('hidden'); p.style.display='none'; }
             })();
 
             alert('出題割合（出題数）を保存しました。次回以降もこの設定が使用されます。');
-            // ✅ alert後に閉じる（描画タイミング差による閉じない問題を回避）
+
             toggleSettingsPanel(false);
     } finally {
-        // ✅ 例外が起きても必ず閉じる（v40）
+
         const p=document.getElementById('settingsPanel');
         if(p){ p.hidden = true; p.classList.add('hidden'); p.style.display='none'; }
     }
@@ -1085,28 +1033,43 @@ function updateDistributionStatus() {
         let userName = "";
         
         // DOMContentLoadedイベント
+        
+        // DOMContentLoadedイベント
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM準備完了');
-            
             const fileInput = document.getElementById('fileInput');
             if (fileInput) {
                 fileInput.addEventListener('change', function(event) {
-                    console.log('ファイル選択イベント発生');
                     const file = event.target.files[0];
-                    if (!file) {
-                        console.log('ファイルが選択されていません');
-                        return;
-                    }
-                    
-                    console.log('選択されたファイル:', file.name);
+                    if (!file) return;
                     processFile(file);
                 });
             }
-            
-            // Claude.ai環境での自動読み込み
-            setTimeout(function() {
-                tryAutoLoadFile();
-            }, 500);
+
+            const applyBtn = document.getElementById('applyDistributionBtn');
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    applyDistribution();
+                    updateStartButtonState();
+                });
+            }
+
+            // 初期表示
+            renderDistributionInputs();
+            displayChapterInfo();
+            updateDistributionStatus();
+            updateStartButtonState();
+
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.addEventListener('input', updateStartButtonState);
+
+            const dist = document.getElementById('distributionInputs');
+            if (dist) {
+                dist.addEventListener('input', function() {
+                    updateDistributionStatus();
+                    updateStartButtonState();
+                });
+            }
         });
         
         // ファイル処理
@@ -1118,12 +1081,11 @@ function updateDistributionStatus() {
             const reader = new FileReader();
             
             reader.onload = function(e) {
-                console.log('ファイル読み込み完了');
+
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    console.log('Excelファイル解析成功');
-                    
+
                     parseWorkbook(workbook);
                     
                 } catch (error) {
@@ -1144,7 +1106,7 @@ function updateDistributionStatus() {
         
         // Workbook解析
         function parseWorkbook(workbook) {
-            console.log('Workbook解析開始（Excelフォーマット最適化版）');
+
             allQuestions = [];
             questionsByChapter = {};
 
@@ -1224,7 +1186,7 @@ function updateDistributionStatus() {
 
             window.allQuestions = allQuestions;
             window.questionsByChapter = questionsByChapter;
-            console.log(`✅ 全${allQuestions.length}問を読み込みました`);
+
             displayResults();
             if (typeof updateStartButtonState==='function') updateStartButtonState();
             updateStartButtonState();
@@ -1352,8 +1314,7 @@ function displayChapterBreakdown() {
             document.getElementById('testScreen').classList.remove('hidden');
             document.body.classList.add('inTest');
             // start画面側の表示要素は CSS（body.inTest ...）で隠す。DOMは削除しない
-            
-            // ✅ テスト開始時は必ず最上部へスクロール（残り時間を確実に表示）
+
             requestAnimationFrame(() => {
                 try {
                     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -1726,7 +1687,6 @@ function displayChapterBreakdown() {
             document.getElementById('startScreen').classList.remove('hidden');
             document.body.classList.remove('inTest');
 
-            // ✅ 開始画面へ戻るときも最上部へ
             try {
                 window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
             } catch (e) {
@@ -1734,7 +1694,6 @@ function displayChapterBreakdown() {
             }
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
-
 
             const timerEl = document.getElementById('timer');
             if (timerEl) {
@@ -1768,21 +1727,19 @@ function displayChapterBreakdown() {
         
         // 印刷機能
         function printResult() {
-            console.log('🖨️ 印刷機能が呼び出されました');
 
             // 解答詳細を表示（まだ表示されていない場合）
             const answerReview = document.getElementById('answerReview');
             if (answerReview && answerReview.classList.contains('hidden')) {
-                console.log('解答詳細を表示します');
+
                 showAnswerReview();
             }
 
-            // ✅ 重要：window.print() はユーザー操作に直結した同期処理で呼ぶ必要があるため、
             // setTimeout は避け、DOM反映用に requestAnimationFrame を1フレームだけ挟む
             requestAnimationFrame(() => {
                 try {
                     window.print();
-                    console.log('✅ 印刷ダイアログが呼び出されました');
+
                 } catch (error) {
                     console.error('❌ 印刷エラー:', error);
                     alert('印刷機能でエラーが発生しました。ブラウザの印刷機能（Ctrl+P / ⌘+P）をお試しください。');
@@ -1801,22 +1758,7 @@ function displayChapterBreakdown() {
                 }
             }
         });
-        
-        // Claude.ai環境での自動読み込み
-        async function tryAutoLoadFile() {
-            try {
-                if (window.fs && window.fs.readFile) {
-                    console.log('Claude.ai環境でファイル自動読み込みを試行');
-                    const arrayBuffer = await window.fs.readFile('演習問題_all.xlsx');
-                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                    parseWorkbook(workbook);
-                }
-            } catch (error) {
-                console.log('自動読み込みできません（通常の使用では問題ありません）');
-            }
-        }
-    
-// ✅ 出題割合設定パネルの表示切替（v34）
+
 function toggleSettingsPanel(forceOpen = null) {
     const panel = document.getElementById('settingsPanel');
     if (!panel) return;
@@ -1834,75 +1776,8 @@ function toggleSettingsPanel(forceOpen = null) {
     }
 }
 
+
 </script>
 
-<script>
-(function(){
-  function tick(){
-    try{
-      if(typeof updateStartButtonState==='function'){ updateStartButtonState(); }
-    }catch(e){
-      var d=document.getElementById('diag');
-      if(d){ d.innerHTML += '❌ tick error: '+e.message+'<br>'; }
-    }
-  }
-  document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(tick, 0); });
-})();
-</script>
-
-<script>
-(function(){
-  function q(id){return document.getElementById(id);}
-  function mk(ok){return ok?'✅':'❌';}
-  function calcTotal(){
-    const c=q('distributionInputs');
-    if(!c) return null;
-    const inputs=c.querySelectorAll('input[type="number"]');
-    if(!inputs.length) return null;
-    let t=0; inputs.forEach(i=>t+=Number(i.value||0));
-    return t;
-  }
-  function render(){
-    const diag=q('diag'); if(!diag) return;
-    const name=(q('userName')?.value||'').trim();
-    const fileLoaded = (window.allQuestions && window.allQuestions.length>0);
-    const total=calcTotal();
-    const totalOk = (total===50);
-    diag.innerHTML = '診断:<br>' +
-      mk(!!name)+' 名前入力（'+(name||'未入力')+'）<br>' +
-      mk(fileLoaded)+' Excel読込（'+(fileLoaded?window.allQuestions.length:0)+'問）<br>' +
-      mk(totalOk)+' 合計50（現在: '+(total===null?'未計算':total)+'）<br>' +
-      'XLSX: '+(typeof XLSX!=='undefined'?'OK':'NG')+'<br>' +
-      'startBtn disabled: '+(q('startBtn')?.disabled) + '<br>';
-  }
-  document.addEventListener('DOMContentLoaded', ()=>{
-    render();
-    setInterval(render, 500);
-    const nameEl=q('userName'); if(nameEl) nameEl.addEventListener('input', render);
-  });
-})();
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    if (typeof renderDistributionInputs === 'function') {
-      renderDistributionInputs();
-    }
-  } catch(e) {
-    const d=document.getElementById('diag');
-    if(d) d.innerHTML += '❌ renderDistributionInputs error: '+e.message+'<br>';
-  }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', ()=>{
-  const btn=document.getElementById('applyDistributionBtn');
-  if(btn){
-    btn.onclick = (e)=>{ e.preventDefault(); applyDistribution(); };
-  }
-});
-</script>
 </body>
 </html>
